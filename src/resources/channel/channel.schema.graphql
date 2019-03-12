@@ -1,0 +1,17 @@
+type Channel {
+  id: Int!
+  name: String!
+  public: Boolean!
+  messages: [Message!]!
+  members: [User!]!
+  owner: User!
+}
+
+type Query {
+  allChannels: [Channel!]!
+  getChannelMembers(channelId: Int!): [User]
+}
+
+type Mutation {
+  createChannel(name: String!, public: Boolean = false): Channel
+}

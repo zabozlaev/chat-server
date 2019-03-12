@@ -1,0 +1,27 @@
+{
+  "dependencies": {
+    "apollo-server-express": "^2.4.8",
+    "bcryptjs": "^2.4.3",
+    "body-parser": "^1.18.3",
+    "cors": "^2.8.5",
+    "express": "^4.16.4",
+    "graphql": "^14.1.1",
+    "jsonwebtoken": "^8.5.0",
+    "lodash": "^4.17.11",
+    "merge-graphql-schemas": "^1.5.8",
+    "pg": "^7.8.2",
+    "sequelize": "^4.43.0"
+  },
+  "scripts": {
+    "start": "nodemon src/index.js"
+  },
+  "devDependencies": {
+    "nodemon": "^1.18.10"
+  },
+  "name": "chat-server",
+  "version": "1.0.0",
+  "main": "index.js",
+  "repository": "https://github.com/zabozlaev/chat-server.git",
+  "author": "zabozlaev <hunter.eal@yandex.ru>",
+  "license": "MIT"
+}

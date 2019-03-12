@@ -1,0 +1,11 @@
+type DirectMessage {
+  id: Int!
+  to: User!
+  from: User!
+  createdAt: String
+}
+
+type Query {
+  
+}
+

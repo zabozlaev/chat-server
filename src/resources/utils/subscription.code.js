@@ -1,0 +1,1 @@
+module.exports = { NEW_CHANNEL_MESSAGE: "NEW_CHANNEL_MESSAGE" };
