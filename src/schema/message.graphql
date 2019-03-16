@@ -1,0 +1,20 @@
+type Message {
+  id: Int!
+  text: String!
+  imageUrl: String
+  created: String
+  author: User!
+  channel: Channel!
+}
+
+type Query {
+  messages(channelId: Int!, cursor: Int, limit: Int): [Message!]!
+}
+
+type Mutation {
+  createMessage(channelId: Int!, text: String!, imageUrl: String): Message
+}
+
+type Subscription {
+  newMessage(channelId: Int!): Message!
+}

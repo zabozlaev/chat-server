@@ -1,17 +1,20 @@
 module.exports = (sequelize, DataTypes) => {
-  const Member = sequelize.define("member", {
-    created_at: DataTypes.DATE,
-    isBanned: {
-      type: DataTypes.BOOLEAN,
-      default: false
-    },
-    isAdmin: {
-      type: DataTypes.BOOLEAN,
-      defaultValue() {
-        return false;
+  const Member = sequelize.define(
+    "member",
+    {
+      isBanned: {
+        type: DataTypes.BOOLEAN,
+        defaultValue: () => false
+      },
+      isAdmin: {
+        type: DataTypes.BOOLEAN,
+        defaultValue() {
+          return false;
+        }
       }
-    }
-  });
+    },
+    { timestamps: true }
+  );
 
   Member.associate = models => {
     Member.belongsTo(models.User, {

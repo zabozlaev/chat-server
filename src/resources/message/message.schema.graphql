@@ -7,7 +7,7 @@ type Message {
 }
 
 type Query {
-  messages(channelId: String!): [Message!]
+  messages(channelId: String!, cursor: Int, limit: Int): [Message!]
 }
 
 type Mutation {

@@ -1,0 +1,18 @@
+type User {
+  id: Int!
+  email: String!
+  username: String!
+  channels: [Channel!]
+}
+
+type Query {
+  hello: String
+  me: User!
+  allUsers: [User!]!
+}
+
+type Mutation {
+  register(input: registerInput!): RegisterResponse
+  login(email: String!, password: String!): AuthResponse!
+  refreshToken(token: String!): AuthResponse!
+}

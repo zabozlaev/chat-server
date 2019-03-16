@@ -2,7 +2,7 @@ const jwt = require("jsonwebtoken");
 
 const {
   token: { accessSecret }
-} = require("../../config");
+} = require("./config");
 
 const verifyToken = token => {
   return new Promise(resolve => {
@@ -18,6 +18,7 @@ const decode = async authHeader => {
     const decoded = await verifyToken(token);
     return decoded;
   }
+  console.log("NO TOKEN");
 };
 
 const createToken = (

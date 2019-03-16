@@ -2,7 +2,7 @@ const bcrypt = require("bcryptjs");
 
 module.exports = (sequelize, DataTypes) => {
   const User = sequelize.define(
-    "user",
+    "users",
     {
       username: {
         type: DataTypes.STRING,
@@ -42,7 +42,6 @@ module.exports = (sequelize, DataTypes) => {
     {
       hooks: {
         async beforeCreate(user) {
-          console.log(user.password);
           user.password = await bcrypt.hash(user.password, 10);
         }
       }

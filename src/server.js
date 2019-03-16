@@ -1,49 +1,57 @@
 const express = require("express");
-
 const { json, urlencoded } = require("body-parser");
-
 const cors = require("cors");
-
 const { ApolloServer, makeExecutableSchema } = require("apollo-server-express");
 
-const {
-  fileLoader,
-  mergeTypes,
-  mergeResolvers
-} = require("merge-graphql-schemas");
-
-const path = require("path");
-
-const db = require("./models");
-
 const app = express();
+const db = require("./models");
+const { decode } = require("./auth");
+const schemaLoaded = require("./utils/loadSchema");
 
 app.use(cors("*"));
-
 app.use(json());
 app.use(urlencoded({ extended: false }));
 
-const { decode } = require("./resources/utils/jwt.service");
+const force = false;
 
 module.exports = async () => {
-  await db.sequelize.sync({ force: true });
+  await db.sequelize.sync({ force });
 
-  const typeDefs = mergeTypes(
-    fileLoader(path.join(__dirname, "/resources/**/*.schema.graphql"))
-  );
-
-  const resolvers = mergeResolvers(
-    fileLoader(path.join(__dirname, "/resources/**/*.resolver.js"))
-  );
-
-  const schema = makeExecutableSchema({ resolvers, typeDefs });
+  const schema = makeExecutableSchema(schemaLoaded);
 
   const server = new ApolloServer({
     schema,
-    context: async ({ req }) => {
-      const user = await decode(req.headers.authorization);
+    context: async ({ req, connection }) => {
+      const userId =
+        req && req.headers.authorization
+          ? (await decode(req.headers.authorization)).userId
+          : connection && connection.context && connection.context.userId;
 
-      return { user };
+      console.log(userId);
+
+      return {
+        req,
+        db,
+        userId
+      };
+    },
+    subscriptions: {
+      onConnect: async (connectionParams, ws, ctx) => {
+        if (connectionParams.authorization) {
+          let user_id;
+
+          if ((user_id = await decode(connectionParams.authorization))) {
+            console.log(user_id);
+            return {
+              user: {
+                userId: user_id
+              }
+            };
+          }
+        }
+
+        throw new Error("Authorization required");
+      }
     }
   });
 

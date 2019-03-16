@@ -3,7 +3,11 @@ module.exports = (sequelize, DataTypes) => {
     text: {
       type: DataTypes.STRING
     },
-    imageUrl: DataTypes.STRING
+    imageUrl: DataTypes.STRING,
+    created_at: {
+      type: DataTypes.DATE,
+      defaultValue: DataTypes.NOW
+    }
   });
 
   Message.associate = models => {

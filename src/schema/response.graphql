@@ -1,0 +1,23 @@
+type AuthResponse {
+  accessToken: String
+  refreshToken: String
+  errors: [Error!]
+}
+
+type RegisterResponse {
+  success: Boolean!
+  user: User
+  errors: [Error!]
+}
+
+type CreateChannelResponse {
+  success: Boolean!
+  channel: Channel
+  errors: [Error!]
+}
+
+type DirectMessageCreatedResponse {
+  success: Boolean!
+  directMessage: DirectMessage!
+  errors: [Error!]
+}

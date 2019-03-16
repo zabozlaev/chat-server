@@ -1,13 +1,10 @@
 module.exports = (sequelize, DataTypes) => {
-  const DirectMessage = sequelize.define(
-    "direct_message",
-    {
-      text: {
-        type: DataTypes.STRING
-      }
+  const DirectMessage = sequelize.define("direct_message", {
+    text: {
+      type: DataTypes.STRING
     },
-    { timestamps: true }
-  );
+    created: { type: DataTypes.DATE, defaultValue: DataTypes.NOW }
+  });
 
   DirectMessage.associate = models => {
     DirectMessage.belongsTo(models.User, {

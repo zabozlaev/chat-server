@@ -1,0 +1,19 @@
+type Channel {
+  id: Int!
+  name: String!
+  members: [User!]
+  owner: User!
+  created: String
+}
+
+type Query {
+  getChannels: [Channel!]!
+}
+
+type Mutation {
+  createChannel(name: String): CreateChannelResponse!
+}
+
+# type Subscription {
+
+# }

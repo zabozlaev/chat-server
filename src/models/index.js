@@ -10,7 +10,8 @@ const sequelize = new Sequelize(name, user, password, {
   host: process.env.DB_HOST || "localhost",
   dialect: "postgres",
   operatorsAliases: Sequelize.Op,
-  // logging: false,
+  // operatorsAliases: false,
+  // // logging: false,
   underscored: true,
   define: {
     charset: "utf8",

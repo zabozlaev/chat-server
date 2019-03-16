@@ -1,49 +1,37 @@
-const _ = require("lodash");
+const { isAuthenticated } = require("../middleware");
 
-const { baseAuth } = require("../utils/auth.middleware");
+const { combineResolvers } = require("graphql-resolvers");
 
-const { createToken } = require("../utils/jwt.service");
+const { createToken } = require("../auth");
 
-const db = require("../../models");
-
-const formatErrors = (e, db) => {
-  if (e instanceof db.sequelize.ValidationError) {
-    return Object.keys(e.errors).map(x => _.pick(e[x], ["path", "message"]));
-  }
-  return [{ path: "Server error.", Message: "someting went wrong." }];
-};
+const { validationErrors } = require("../utils/prettifyError");
 
 module.exports = {
   User: {
-    channels: (parent, args, { userId }) =>
+    channels: (parent, args, { db, userId }) =>
       db.sequelize.query(
-        `
-        select * from channel join member on channel.id = member.channel_id where member.user_id = ?
-      `,
+        "select * from channel join member on channel.id = member.channel_id where member.user_id = ?",
         {
           replacements: [userId],
-          models: db.Channel,
+          model: db.Channel,
           raw: true
         }
       )
   },
   Query: {
-    hello: _ => {
-      return "string";
-    },
-    me: baseAuth((_, __, { userId }) => {
+    me: combineResolvers(isAuthenticated, (_, __, { userId }) => {
       return db.User.findOne({
         where: {
           id: userId
         }
       });
     }),
-    allUsers() {
+    allUsers(_, __, { db }) {
       return db.User.findAll();
     }
   },
   Mutation: {
-    async register(parent, { input }) {
+    async register(parent, { input }, { db }) {
       try {
         const user = await db.User.create(input);
         return {
@@ -51,13 +39,14 @@ module.exports = {
           user
         };
       } catch (error) {
+        console.log(error);
         return {
           success: false,
-          errors: formatErrors(error, db)
+          errors: validationErrors(error)
         };
       }
     },
-    async login(parent, { email, password }) {
+    async login(parent, { email, password }, { db }) {
       const user = await db.User.findOne({
         where: {
           email
@@ -75,7 +64,7 @@ module.exports = {
         accessToken: token
       };
     },
-    async refreshToken(_, { token }) {
+    async refreshToken(_, { token }, { db }) {
       const tokenFound = await db.RefreshToken.findOne({
         token
       });
