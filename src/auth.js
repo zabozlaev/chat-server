@@ -18,7 +18,7 @@ const decode = async authHeader => {
     const decoded = await verifyToken(token);
     return decoded;
   }
-  console.log("NO TOKEN");
+  return null;
 };
 
 const createToken = (
