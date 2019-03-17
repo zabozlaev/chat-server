@@ -28,7 +28,8 @@ module.exports = {
     }),
     allUsers(_, __, { db }) {
       return db.User.findAll();
-    }
+    },
+    userNumber: (_, __, { db }) => db.User.count({})
   },
   Mutation: {
     async register(parent, { input }, { db }) {
