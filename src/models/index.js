@@ -28,7 +28,8 @@ const db = {
   Member: sequelize.import("./member"),
   RefreshToken: sequelize.import("./refreshToken"),
   Blacklist: sequelize.import("./blacklist"),
-  DirectMessage: sequelize.import("./directMessage")
+  DirectMessage: sequelize.import("./directMessage"),
+  Invite: sequelize.import("./invite")
 };
 
 Object.keys(db).forEach(modelName => {

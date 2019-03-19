@@ -1,4 +1,4 @@
-const { isAuthenticated } = require("../middleware");
+const { isAuthenticated, channelOwnerAccess } = require("../middleware");
 
 const { combineResolvers } = require("graphql-resolvers");
 
@@ -19,6 +19,26 @@ module.exports = {
         );
 
         return result[0];
+      }
+    ),
+    getInvites: combineResolvers(
+      isAuthenticated,
+      async (parent, args, { userId, db }) => {
+        const { channel_id } = await db.Invite.findAll({
+          where: {
+            user_id: userId
+          }
+        });
+
+        const result = await db.sequelize.query(
+          `select * from channel join invites on invite.channel_id = channel.id where invite.user_id = ?`,
+          {
+            replacements: [userId],
+            models: db.Channel,
+            raw: true
+          }
+        );
+        console.log(result);
       }
     )
   },
@@ -79,6 +99,20 @@ module.exports = {
             ]
           };
         }
+      }
+    ),
+    createInvite: combineResolvers(
+      isAuthenticated,
+      channelOwnerAccess,
+      async (_, { channelId, inviteTargetId }, { db }) => {
+        await db.Invite.create({
+          user_id: inviteTargetId,
+          channel_id: channelId
+        });
+
+        return {
+          success: true
+        };
       }
     )
   },

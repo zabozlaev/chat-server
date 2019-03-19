@@ -24,7 +24,7 @@ const isAdmin = combineResolvers(
       });
       return member.isAdmin ? skip : new ForbiddenError("You're not an admin.");
     } catch (error) {
-      throw new ForbiddenError("Forbidden.");
+      return new ForbiddenError("Forbidden.");
     }
   }
 );
@@ -54,8 +54,31 @@ const channelAccess = async (parent, { channelId }, { userId }) => {
   // check if part of the team
 };
 
+const directMessageAccess = async (parent, { ownUserId }, { db, userId }) => {
+  return !ownUserId || !userId || userId !== ownUserId
+    ? new ForbiddenError("Stop you little hacker!")
+    : skip;
+};
+
+const channelOwnerAccess = async (parent, { channelId }, { db, userId }) => {
+  const isAdmin = await db.Member.findOne({
+    where: {
+      user_id: userId,
+      channel_id: channelId,
+      isAdmin: true
+    }
+  });
+
+  if (!isAdmin) {
+    return new ForbiddenError("You're not an owner.");
+  }
+
+  return skip;
+};
+
 module.exports = {
   isAdmin,
   isAuthenticated,
-  channelAccess
+  channelAccess,
+  channelOwnerAccess
 };

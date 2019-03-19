@@ -16,8 +16,26 @@ type CreateChannelResponse {
   errors: [Error!]
 }
 
+type CreateMessageResponse {
+  success: Boolean!
+  channel: Int
+  errors: [Error!]
+}
+
 type DirectMessageCreatedResponse {
   success: Boolean!
   directMessage: DirectMessage!
   errors: [Error!]
+}
+
+type GetInvitesResponse {
+  channels: [String!]
+  membersCount: Int
+  errors: [Error!]
+  success: Boolean!
+}
+
+type CreateInviteResponse {
+  errors: [Error!]
+  success: Boolean!
 }

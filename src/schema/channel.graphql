@@ -8,10 +8,12 @@ type Channel {
 
 type Query {
   getChannels: [Channel!]!
+  getInvites: GetInvitesResponse!
 }
 
 type Mutation {
   createChannel(name: String): CreateChannelResponse!
+  createInvite(channelId: Int!, inviteTargetId: Int!): CreateInviteResponse!
 }
 
 # type Subscription {

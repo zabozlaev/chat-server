@@ -1,7 +1,11 @@
 const express = require("express");
 const { json, urlencoded } = require("body-parser");
 const cors = require("cors");
-const { ApolloServer, makeExecutableSchema } = require("apollo-server-express");
+const {
+  ApolloServer,
+  makeExecutableSchema,
+  ForbiddenError
+} = require("apollo-server-express");
 
 const expressRateLimit = require("express-rate-limit");
 
@@ -21,17 +25,17 @@ module.exports = async () => {
 
   const schema = makeExecutableSchema(schemaLoaded);
 
-  // const limiter = expressRateLimit({
-  //   windowMs: 1 * 60 * 1000, // 15 minutes
-  //   max: 50, // limit each IP to 100 requests per windowMs
-  //   message: JSON.stringify({
-  //     message: "Too many requests from this ip decected.",
-  //     path: "request",
-  //     code: 429
-  //   })
-  // });
+  const limiter = expressRateLimit({
+    windowMs: 1 * 60 * 1000, // 15 minutes
+    max: 100, // limit each IP to 100 requests per windowMs
+    message: JSON.stringify({
+      message: "Too many requests from this ip decected.",
+      path: "request",
+      code: 429
+    })
+  });
 
-  // app.use(limiter);
+  app.use(limiter);
 
   const server = new ApolloServer({
     schema,
@@ -52,16 +56,16 @@ module.exports = async () => {
     subscriptions: {
       onConnect: async (connectionParams, ws, ctx) => {
         if (connectionParams.authorization) {
-          let user_id;
+          let userDecoded;
 
-          if ((user_id = await decode(connectionParams.authorization))) {
+          if ((userDecoded = await decode(connectionParams.authorization))) {
             return {
-              userId: user_id.userId
+              userId: userDecoded.userId
             };
           }
         }
 
-        throw new Error("Authorization required.");
+        throw new ForbiddenError("Authorization required.");
       }
     }
   });

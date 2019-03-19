@@ -9,6 +9,7 @@ type Query {
   hello: String
   me: User!
   allUsers: [User!]!
+  userNumber: Int!
 }
 
 type Mutation {

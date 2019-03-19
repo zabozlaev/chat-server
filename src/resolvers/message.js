@@ -17,6 +17,15 @@ module.exports = {
           }
         )
       )
+    },
+    userTyping: {
+      subscribe: combineResolvers(
+        channelAccess,
+        withFilter(
+          () => pubsub.asyncIterator(tags.USER_TYPING),
+          (payload, args) => payload.channelId === args.channelId
+        )
+      )
     }
   },
   Message: {
@@ -70,6 +79,23 @@ module.exports = {
     )
   },
   Mutation: {
+    emitTyping: combineResolvers(
+      channelAccess,
+      async (_, { channelId }, { userId, db }) => {
+        const { username } = await db.User.findOne({
+          where: {
+            id: userId
+          }
+        });
+
+        pubsub.publish(tags.USER_TYPING, {
+          channelId,
+          userTyping: username
+        });
+
+        return true;
+      }
+    ),
     createMessage: combineResolvers(
       isAuthenticated,
       async (parent, { channelId, text, imageUrl }, { db, userId }) => {
