@@ -10,7 +10,7 @@
     "graphql-redis-subscriptions": "^2.1.0",
     "graphql-resolvers": "^0.3.2",
     "graphql-subscriptions": "^1.0.0",
-    "jsonwebtoken": "^8.5.0",
+    "jsonwebtoken": "8.4.0",
     "lodash": "^4.17.11",
     "merge-graphql-schemas": "^1.5.8",
     "pg": "^7.8.2",

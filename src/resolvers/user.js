@@ -16,10 +16,11 @@ module.exports = {
           model: db.Channel,
           raw: true
         }
-      )
+      ),
+    avatarUrl: ({ avatarUrl, avatar_url }) => avatarUrl || avatar_url
   },
   Query: {
-    me: combineResolvers(isAuthenticated, (_, __, { userId }) => {
+    me: combineResolvers(isAuthenticated, (_, __, { userId, db }) => {
       return db.User.findOne({
         where: {
           id: userId
@@ -40,7 +41,6 @@ module.exports = {
           user
         };
       } catch (error) {
-        console.log(error);
         return {
           success: false,
           errors: validationErrors(error)
@@ -54,7 +54,14 @@ module.exports = {
         }
       });
       if (!user || !(await user.comparePassword(password))) {
-        throw new Error("No user found.");
+        return {
+          errors: [
+            {
+              path: "Login",
+              message: "Wrong credentials provided."
+            }
+          ]
+        };
       }
 
       const { token } = createToken({ userId: user.id });

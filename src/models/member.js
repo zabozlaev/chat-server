@@ -2,11 +2,11 @@ module.exports = (sequelize, DataTypes) => {
   const Member = sequelize.define(
     "member",
     {
-      isBanned: {
+      is_banned: {
         type: DataTypes.BOOLEAN,
         defaultValue: () => false
       },
-      isAdmin: {
+      is_admin: {
         type: DataTypes.BOOLEAN,
         defaultValue() {
           return false;

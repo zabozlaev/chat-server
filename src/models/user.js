@@ -1,4 +1,5 @@
 const bcrypt = require("bcryptjs");
+const crypto = require("crypto");
 
 module.exports = (sequelize, DataTypes) => {
   const User = sequelize.define(
@@ -37,11 +38,22 @@ module.exports = (sequelize, DataTypes) => {
             msg: "Password length is incorrect."
           }
         }
+      },
+      avatar_url: {
+        type: DataTypes.STRING
       }
     },
     {
       hooks: {
         async beforeCreate(user) {
+          if (!user.avatar_url) {
+            generated = crypto
+              .createHash("md5")
+              .update(user.email)
+              .digest("hex");
+
+            user.avatar_url = `https://www.gravatar.com/avatar/${generated}?s=32&d=identicon&r=PG`;
+          }
           user.password = await bcrypt.hash(user.password, 10);
         }
       }

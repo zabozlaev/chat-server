@@ -3,22 +3,58 @@ const { isAuthenticated, channelOwnerAccess } = require("../middleware");
 const { combineResolvers } = require("graphql-resolvers");
 
 module.exports = {
+  Channel: {
+    owner: ({ owner, owner_id }, _, { db }) => {
+      return (
+        owner ||
+        db.User.findOne({
+          where: {
+            id: owner_id
+          }
+        })
+      );
+    },
+    members: ({ members, id }, _, { db }) =>
+      members ||
+      db.sequelize.query(
+        ` select * from users
+          join member on users.id = member.user_id
+          where  member.channel_id = ?`,
+        {
+          replacements: [id],
+          model: db.User,
+          raw: true
+        }
+      ),
+    lastMessage: ({ lastMessage, id }, _, { db }) => {
+      return (
+        lastMessage ||
+        db.sequelize.query(
+          `select * from message where channel_id = ? limit 1`,
+          {
+            replacements: [id],
+            model: db.Channel,
+            raw: true
+          }
+        )[0]
+      );
+    }
+  },
   Query: {
     getChannels: combineResolvers(
       isAuthenticated,
       async (parent, args, { db, userId }) => {
         const result = await db.sequelize.query(
           `
-          select * from channel join member on member.channel_id = channel.id where member.user_id = ? 
-          `,
+          select * from channel join member on member.channel_id = channel.id where member.user_id = ? `,
           {
             replacements: [userId],
-            models: db.Channel,
+            model: db.Channel,
             raw: true
           }
         );
 
-        return result[0];
+        return result;
       }
     ),
     getInvites: combineResolvers(
@@ -77,7 +113,7 @@ module.exports = {
                 {
                   user_id: userId,
                   channel_id: channel.id,
-                  isAdmin: true
+                  is_admin: true
                 },
                 { transaction }
               );
@@ -89,6 +125,7 @@ module.exports = {
             channel: transactionResult
           };
         } catch (error) {
+          console.log(error);
           return {
             success: false,
             errors: [
@@ -105,14 +142,20 @@ module.exports = {
       isAuthenticated,
       channelOwnerAccess,
       async (_, { channelId, inviteTargetId }, { db }) => {
-        await db.Invite.create({
-          user_id: inviteTargetId,
-          channel_id: channelId
-        });
+        try {
+          await db.Invite.create({
+            user_id: inviteTargetId,
+            channel_id: channelId
+          });
 
-        return {
-          success: true
-        };
+          return {
+            success: true
+          };
+        } catch (error) {
+          return {
+            success: false
+          };
+        }
       }
     )
   },

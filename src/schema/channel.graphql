@@ -4,6 +4,7 @@ type Channel {
   members: [User!]
   owner: User!
   created: String
+  lastMessage: Message
 }
 
 type Query {

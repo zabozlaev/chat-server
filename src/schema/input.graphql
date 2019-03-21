@@ -1,4 +1,4 @@
-input registerInput {
+input RegisterInput {
   email: String!
   password: String!
   username: String!

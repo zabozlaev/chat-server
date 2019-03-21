@@ -32,7 +32,7 @@ module.exports = {
     author: ({ author, user_id }, args, { db }) => {
       return author || db.User.findOne({ where: { id: user_id } });
     },
-    created: ({ created, created_at }) => created || created_at
+    created: ({ created, created_at }) => created || created_at.toString()
   },
   Query: {
     getMessages: combineResolvers(
@@ -60,7 +60,7 @@ module.exports = {
           : {};
 
         const options = {
-          order: [["created_at", "DESC"]],
+          order: [["created_at", "ASC"]],
           where: { channel_id: channelId }
           // limit,
           // ...cursorOptions

@@ -3,6 +3,7 @@ type User {
   email: String!
   username: String!
   channels: [Channel!]
+  avatarUrl: String
 }
 
 type Query {
@@ -13,7 +14,7 @@ type Query {
 }
 
 type Mutation {
-  register(input: registerInput!): RegisterResponse
+  register(input: RegisterInput!): RegisterResponse
   login(email: String!, password: String!): AuthResponse!
   refreshToken(token: String!): AuthResponse!
 }

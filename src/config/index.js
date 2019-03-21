@@ -7,7 +7,8 @@ module.exports = {
   },
   port: process.env.PORT || 4000,
   token: {
-    accessSecret: process.env.JWT_SECRET || "test",
-    refreshSecret: process.env.REFRESH_SECRET || "test2"
+    accessSecret: process.env.JWT_SECRET || "uisy23XQntsoaw8PGmhlx09MF6himeZt",
+    refreshSecret:
+      process.env.REFRESH_SECRET || "uisy23XQntsoaw8PGmhlx09MF6himeZt"
   }
 };
