@@ -39,3 +39,8 @@ type CreateInviteResponse {
   errors: [Error!]
   success: Boolean!
 }
+
+type LogoutResponse {
+  success: Boolean!
+  errors: [Error!]
+}

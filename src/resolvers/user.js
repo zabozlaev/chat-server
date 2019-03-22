@@ -2,7 +2,7 @@ const { isAuthenticated } = require("../middleware");
 
 const { combineResolvers } = require("graphql-resolvers");
 
-const { createToken } = require("../auth");
+const { createToken, getOrCreateRefreshToken } = require("../auth");
 
 const { validationErrors } = require("../utils/prettifyError");
 
@@ -65,11 +65,12 @@ module.exports = {
       }
 
       const { token } = createToken({ userId: user.id });
-      const refreshToken = await db.RefreshToken.create({ user_id: 1 });
+
+      const refreshToken = await getOrCreateRefreshToken(user.id);
 
       return {
-        refreshToken: refreshToken.token,
-        accessToken: token
+        accessToken: token,
+        refreshToken: refreshToken
       };
     },
     async refreshToken(_, { token }, { db }) {
@@ -85,12 +86,37 @@ module.exports = {
       }
 
       const createdToken = createToken({ userId: tokenFound.user_id });
-      const refreshToken = await db.RefreshToken.create({ user_id: 1 });
+      const refreshToken = await db.RefreshToken.create({ user_id: user.id });
       await tokenFound.destroy();
       return {
         accessToken: createdToken.token,
         refreshToken
       };
-    }
+    },
+    logout: combineResolvers(
+      isAuthenticated,
+      async (_, { refreshToken }, { db, userId }) => {
+        const refreshTokenFound = await db.RefreshToken.findOne({
+          where: {
+            token: refreshToken
+          }
+        });
+        if (!refreshToken || refreshTokenFound.user_id !== userId) {
+          return {
+            success: false,
+            errors: [
+              {
+                message: "Invalid refreshToken provided.",
+                path: "logout"
+              }
+            ]
+          };
+        }
+        await refreshTokenFound.destroy();
+        return {
+          success: true
+        };
+      }
+    )
   }
 };

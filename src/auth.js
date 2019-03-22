@@ -4,6 +4,8 @@ const {
   token: { accessSecret }
 } = require("./config");
 
+const db = require("./models");
+
 const verifyToken = token => {
   return new Promise((resolve, reject) => {
     jwt.verify(token, accessSecret, {}, (err, decoded) => {
@@ -31,8 +33,29 @@ const createToken = (payload = {}, expiresIn = "2h", secret = accessSecret) => {
   };
 };
 
+const getOrCreateRefreshToken = async userId => {
+  const refreshToken = await db.RefreshToken.findOne({
+    where: {
+      user_id: userId
+    }
+  });
+
+  if (!refreshToken) {
+    const { token } = await db.RefreshToken.create({ user_id: userId });
+    return token;
+  }
+  if (refreshToken.hasExpired()) {
+    await refreshToken.destroy();
+    const { token } = await db.RefreshToken.create({ user_id: userId });
+    return token;
+  }
+
+  return refreshToken.token;
+};
+
 module.exports = {
   verifyToken,
   decode,
-  createToken
+  createToken,
+  getOrCreateRefreshToken
 };
